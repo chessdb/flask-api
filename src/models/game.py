@@ -15,5 +15,7 @@ class Game(BaseModel):
     playing_round = DB.Column(DB.Integer)
     utc_date = DB.Column(DB.Date)
     utc_time = DB.Column(DB.Time(timezone=True))
+    white_elo = DB.Column(DB.Integer)
+    black_elo = DB.Column(DB.Integer)
 
     parsed_timestamp = DB.Column(DB.DateTime(timezone=True), server_default=func.now())

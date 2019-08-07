@@ -13,5 +13,6 @@ class Player(BaseModel):
     surname = DB.Column(DB.String)
     date_of_birth = DB.Column(DB.Date)
     club_id = DB.Column(UUID, DB.ForeignKey("clubs.id"))
+    elo = DB.Column(DB.Integer)
 
     last_updated = DB.Column(DB.DateTime(timezone=True), onupdate=func.now())
