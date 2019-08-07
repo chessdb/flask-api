@@ -4,6 +4,8 @@ from flask_restplus import Api
 from src.api.v1.players import PLAYERS
 from src.api.v1.clubs import CLUBS
 from src.api.v1.games import GAMES
+from src.api.v1.plies import PLIES
+from src.api.v1.positions import POSITIONS
 from src.api.v1.tournaments import TOURNAMENTS
 
 API_V1 = Blueprint(
@@ -34,3 +36,9 @@ API.add_namespace(TOURNAMENTS)
 
 # /api/games
 API.add_namespace(GAMES)
+
+# /api/plies
+API.add_namespace(PLIES)
+
+# /api/positions
+API.add_namespace(POSITIONS)
