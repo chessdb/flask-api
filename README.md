@@ -1,2 +1,2 @@
-# api
-REST api for chessdb
+# landing page
+

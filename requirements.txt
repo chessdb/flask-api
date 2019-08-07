@@ -1,0 +1,8 @@
+sqlalchemy
+flask
+flask-restplus
+flask-sqlalchemy
+flask-migrate
+sentry-sdk[flask]
+psycopg2-binary
+gunicorn
