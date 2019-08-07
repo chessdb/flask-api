@@ -43,7 +43,7 @@ def upgrade():
     sa.Column('white', postgresql.UUID(), nullable=True),
     sa.Column('black', postgresql.UUID(), nullable=True),
     sa.Column('tournament_id', postgresql.UUID(), nullable=True),
-    sa.Column('result', sa.Integer(), nullable=True),
+    sa.Column('result', sa.String(), nullable=True),
     sa.Column('playing_round', sa.Integer(), nullable=True),
     sa.Column('utc_date', sa.Date(), nullable=True),
     sa.Column('utc_time', sa.Time(timezone=True), nullable=True),

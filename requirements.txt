@@ -1,3 +1,5 @@
+python-chess
+werkzeug
 sqlalchemy
 flask
 flask-restplus
@@ -6,3 +8,4 @@ flask-migrate
 sentry-sdk[flask]
 psycopg2-binary
 gunicorn
+git+git://github.com/renatopp/pgnparser
