@@ -32,7 +32,7 @@ class Games(Resource):
     @is_pgn_file
     @save_pgn_file
     def post(self, pgn_file_absolute_path):
-        from src.parsers.pgn import parse
+        from src.parsers.pgn import parser
         print(pgn_file_absolute_path)
-        parse(pgn_file_absolute_path)
+        parser(pgn_file_absolute_path)
         return "f3", HTTPStatus.OK

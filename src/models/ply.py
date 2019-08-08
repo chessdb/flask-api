@@ -12,6 +12,13 @@ class Ply(BaseModel):
     current_position = DB.Column(DB.String, DB.ForeignKey("positions.fen"))
     next_position = DB.Column(DB.String, DB.ForeignKey("positions.fen"))
     game_id = DB.Column(UUID(as_uuid=True), DB.ForeignKey("games.id"))
+    __table_args__ = (
+        DB.UniqueConstraint("current_position",
+                            "next_position",
+                            "game_id",
+                            name="unique_ply",
+                            ),
+    )
 
     def __init__(self, current_position: str, next_position: str, game_id: UUID):
         self.id = uuid.uuid4()

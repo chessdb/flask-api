@@ -9,3 +9,4 @@ sentry-sdk[flask]
 psycopg2-binary
 gunicorn
 git+git://github.com/renatopp/pgnparser
+celery[redis]

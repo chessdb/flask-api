@@ -4,7 +4,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 import config
 from src.api.v1 import API
-from src.extensions import MIGRATE, DB
+from src.extensions import MIGRATE, DB, CELERY
 
 
 def create_app(app_config=config.ProductionConfig):
@@ -30,3 +30,5 @@ def initialize_extensions(app: Flask):
         release="0.0.1",
         send_default_pii=True
     )
+
+    CELERY.config_from_object(app.config)

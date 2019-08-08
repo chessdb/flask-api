@@ -1,90 +1,27 @@
+import logging
 import time
-from uuid import UUID
 
-import chess.pgn
+from src.tasks import parse
 
-from src.models.game import Game
-from src.models.player import Player
-from src.models.ply import Ply
-from src.models.position import Position
+LOGGER = logging.getLogger(__name__)
 
 
-def game_generator(filename: str):
+def parser(filename: str):
     game_counter = 0
     start = time.time()
-    with open(filename) as pgn:
-        game = chess.pgn.read_game(pgn)
-        while game:
-            yield game
-            game = chess.pgn.read_game(pgn)
+    with open(filename) as file_object:
+        previous_line = ""
+        current_game = ""
+        for line in file_object:
+            current_game += line
+            if previous_line == "\n" and line == "\n":
+                parse.delay(current_game)
+                LOGGER.error("parsing: \n'%s'\n" % current_game)
+                current_game = ""
+                previous_line = ""
+                continue
+            previous_line = line
+
     end = time.time()
     elapsed = end - start
     print(f"Game counter: {game_counter}. In {elapsed} seconds.")
-
-
-def parse(filename: str):
-    for game in game_generator(filename=filename):
-        variant = game.headers.get("Variant")
-        if variant != "Standard" and variant is not None:
-            print(f"Variant was not supported: '{variant}'")
-            continue
-
-        site = game.headers.get("Site")
-        if "lichess.org" in site:
-            white = get_or_create_player(game.headers.get("White"))
-            black = get_or_create_player(game.headers.get("Black"))
-            chess_game = get_or_create_game(headers=game.headers, white=white.id, black=black.id)
-            parse_moves(game=game, game_model=chess_game)
-        else:
-            print(f"{site} is not supported.")
-
-
-def get_or_create_player(lichess_username: str):
-    player = Player.query.filter_by(lichess_username=lichess_username).one_or_none()
-    if not player:
-        player = Player(lichess_username=lichess_username)
-        player.store()
-    return player
-
-
-def get_or_create_game(headers: dict, white: UUID, black: UUID) -> Game:
-    chess_game = Game.query.filter_by(site=headers.get("Site")).one_or_none()
-    if chess_game:
-        return chess_game
-    chess_game = Game.lichess(**headers, white=white, black=black)
-    chess_game.store()
-    return chess_game
-
-
-def parse_moves(game, game_model: Game):
-    board = game.board()
-    current_position = board.fen()
-    insert_position_if_not_already_exists(fen=current_position)
-    for move in game.mainline_moves():
-        board.push(move)
-        next_position = board.fen()
-        insert_position_if_not_already_exists(fen=next_position)
-        insert_ply_if_not_already_exists(current_position=current_position, next_position=next_position,
-                                         game_id=game_model.id)
-
-
-def insert_position_if_not_already_exists(fen: str):
-    position = Position.query.get(fen)
-    if position:
-        return position
-    position = Position(fen=fen)
-
-    if not position.store():
-        print(f"Failed to add: {fen}.")
-    return position
-
-
-def insert_ply_if_not_already_exists(current_position: str, next_position: str, game_id: UUID):
-    ply = Ply.query.filter_by(game_id=game_id, current_position=current_position,
-                              next_position=next_position).one_or_none()
-    if ply:
-        return ply
-    ply = Ply(current_position=current_position, next_position=next_position,
-              game_id=game_id)
-    ply.store()
-    return ply
