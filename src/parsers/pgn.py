@@ -58,19 +58,14 @@ def get_or_create_game(headers: dict, white: UUID, black: UUID) -> Game:
 
 def parse_moves(game, game_model: Game):
     board = game.board()
+    current_position = board.fen()
+    insert_position_if_not_already_exists(fen=current_position)
     for move in game.mainline_moves():
-        current_position = board.board_fen()
-        if current_position is None:
-            raise Exception("NEXT POSITION IS NONE")
-        insert_position_if_not_already_exists(fen=current_position)
-        uci_move = move.uci()
         board.push(move)
-        next_position = board.board_fen()
-        if next_position is None:
-            raise Exception("NEXT POSITION IS NONE")
+        next_position = board.fen()
         insert_position_if_not_already_exists(fen=next_position)
         insert_ply_if_not_already_exists(current_position=current_position, next_position=next_position,
-                                         uci_move=uci_move, game_id=game_model.id)
+                                         game_id=game_model.id)
 
 
 def insert_position_if_not_already_exists(fen: str):
@@ -84,12 +79,12 @@ def insert_position_if_not_already_exists(fen: str):
     return position
 
 
-def insert_ply_if_not_already_exists(current_position: str, next_position: str, uci_move: str, game_id: UUID):
+def insert_ply_if_not_already_exists(current_position: str, next_position: str, game_id: UUID):
     ply = Ply.query.filter_by(game_id=game_id, current_position=current_position,
                               next_position=next_position).one_or_none()
     if ply:
         return ply
-    ply = Ply(current_position=current_position, next_position=next_position, algebraic_notation=uci_move,
+    ply = Ply(current_position=current_position, next_position=next_position,
               game_id=game_id)
     ply.store()
     return ply
